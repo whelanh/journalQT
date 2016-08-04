@@ -29,7 +29,7 @@ to a csv file.
 
  
 ### Dependencies
-The class requires an existing [Sqlite](https://www.sqlite.org/about.html) database. The name of
+journalQT requires an existing [Sqlite](https://www.sqlite.org/about.html) database. The name of
 the database does not matter, but it needs a table "journal" with the columns indicated below.
 You can create it with sqlite:
 
