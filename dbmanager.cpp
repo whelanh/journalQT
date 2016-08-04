@@ -6,8 +6,6 @@
 #include <QDebug>
 #include <QDate>
 
-
-
 DbManager::DbManager(const QString &path)
 {
     m_db = QSqlDatabase::addDatabase("QSQLITE");
@@ -15,10 +13,10 @@ DbManager::DbManager(const QString &path)
 
     if (!m_db.open())
     {
-        qDebug() << "Error: connection with database fail";
+        // qDebug() << "Error: connection with database failed";
     } else
     {
-        qDebug() << "Database: connection ok";
+        // qDebug() << "Database: connection ok";
     }
 }
 
@@ -37,7 +35,7 @@ bool DbManager::isOpen() const
 
 QString DbManager::printAllRecords() const
 {
-    qDebug() << "all records db:";
+    // qDebug() << "all records db:";
     QSqlQuery query("SELECT Date, DayOfWeek, Entry FROM journal Order by Date DESC");
     QString answer;
     while (query.next())
@@ -58,13 +56,13 @@ QString DbManager::printAllRecords() const
 
 void DbManager::getLastRecord()
 {
-    qDebug() << "Last entry in journal:";
+    // qDebug() << "Last entry in journal:";
     QSqlQuery query("SELECT ID, Date, Entry FROM journal ORDER BY Date DESC LIMIT 1;");
     int idName = query.record().indexOf("Entry");
     while (query.next())
     {
         QString name = query.value(idName).toString();
-        qDebug() << "===" << name;
+        // qDebug() << "===" << name;
         lastEntry = name;
         idName = query.record().indexOf("Date");
         QString lastdate = query.value(idName).toString();
@@ -72,7 +70,7 @@ void DbManager::getLastRecord()
         idName = query.record().indexOf("ID");
         int lastid = query.value(idName).toInt();
         lastID = lastid;
-        qDebug() << "last ID:" << lastID;
+        // qDebug() << "last ID:" << lastID;
     }
 }
 
@@ -80,16 +78,16 @@ void DbManager::getRecordOnDate(const QDate &date)
 {
     bool success = false;
 
-    qDebug() << "Entry on Date:";
+    // qDebug() << "Entry on Date:";
     QString dt = date.toString("yyyy-MM-dd");
-    qDebug() << dt;
+    // qDebug() << dt;
     QSqlQuery query;
     query.prepare("SELECT ID, Date, Entry FROM journal WHERE Date = (:dt)");
     query.bindValue(":dt", dt);
     success = query.exec();
 
     if(!success) {
-        qDebug() << "query failed";
+        // qDebug() << "query failed";
     } else {
         lastEntry = "";
         lastID = 0;
@@ -97,7 +95,7 @@ void DbManager::getRecordOnDate(const QDate &date)
         while (query.next()) {
             int idName = query.record().indexOf("Entry");
             QString name = query.value(idName).toString();
-            qDebug() << "===" << name;
+            // qDebug() << "===" << name;
             lastEntry = name;
             idName = query.record().indexOf("Date");
             QString lastdate = query.value(idName).toString();
@@ -105,7 +103,7 @@ void DbManager::getRecordOnDate(const QDate &date)
             idName = query.record().indexOf("ID");
             int lastid = query.value(idName).toInt();
             lastID = lastid;
-            qDebug() << "last ID:" << lastID;
+            // qDebug() << "last ID:" << lastID;
         }
     }
 }
@@ -119,7 +117,7 @@ QString DbManager::searchTermQuery(const QString &term)
     QString q("SELECT Date, DayOfWeek, Entry from journal where (journal.Entry LIKE ?) order by Date");
     query.prepare(q);
     query.addBindValue(QString("\%" + term + "\%"));
-    qDebug() << q  << " term:" << term;
+    // qDebug() << q  << " term:" << term;
     success = query.exec();
     QString answer;
 
@@ -221,9 +219,9 @@ void DbManager::writeRecord(int &id, QString &dt, QString &mnth, int &dy, int &y
             success = qupdate.exec();
 
             if (success) {
-                qDebug() << "existing record updated";
+                // qDebug() << "existing record updated";
             } else {
-                qDebug() << "existing record update failed" << qupdate.lastError();
+                // qDebug() << "existing record update failed" << qupdate.lastError();
             }
         }
         else
@@ -240,16 +238,15 @@ void DbManager::writeRecord(int &id, QString &dt, QString &mnth, int &dy, int &y
             query.bindValue(":ein", entry);
             success = query.exec();
             if (success) {
-                qDebug() << "added new record";
+                // qDebug() << "added new record";
             } else {
-                qDebug() << "new record add failed" << query.lastError();
+                // qDebug() << "new record add failed" << query.lastError();
             }
         }
     } else {
-        qDebug() << "check query failed" << checkQuery.lastError();
+        // qDebug() << "check query failed" << checkQuery.lastError();
     }
 }
-
 
 QMap<QString, QString> DbManager::getWeightRecord()
 {
@@ -273,7 +270,7 @@ QMap<QString, QString> DbManager::getWeightRecord()
                         wtMap[date] = match.captured(0);
                         break;
                     }
-                    // qDebug() << "Date:" << date << ": " << word;
+                    // // qDebug() << "Date:" << date << ": " << word;
                 }
             }
         }
@@ -284,14 +281,14 @@ QMap<QString, QString> DbManager::getWeightRecord()
 QString DbManager::getLastRecordDate() const
 {
     QString name;
-    qDebug() << "last date in journal";
+    // qDebug() << "last date in journal";
     QSqlQuery query("SELECT Date, Entry FROM journal ORDER BY Date DESC LIMIT 1;");
     int idName = query.record().indexOf("Date");
     while (query.next())
     {
         name = query.value(idName).toString();
 
-        qDebug() << "===" << name;
+        // qDebug() << "===" << name;
     }
     return name;
 

@@ -8,7 +8,6 @@
 #include <QMessageBox>
 #include <QSettings>
 
-
 static QString PATH = "";
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -95,7 +94,7 @@ void MainWindow::on_weightHistoryButton_clicked()
     QMapIterator<QString, QString> i(map);
     QString answer;
     QString filename = QFileDialog::getSaveFileName(this,
-                                                    "Save To CSV", "weightHistory.csv", "CSV files (.csv);;Zip files (.zip, *.7z)", 0, 0); // getting the filename (full path)
+      "Save To CSV", "weightHistory.csv", "CSV files (.csv);;Zip files (.zip, *.7z)", 0, 0); // getting the filename (full path)
     QFile data(filename);
     if(data.open(QFile::WriteOnly |QFile::Truncate)) {
         QTextStream output(&data);
