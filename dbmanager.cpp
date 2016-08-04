@@ -16,8 +16,7 @@ DbManager::DbManager(const QString &path)
     if (!m_db.open())
     {
         qDebug() << "Error: connection with database fail";
-    }
-    else
+    } else
     {
         qDebug() << "Database: connection ok";
     }
@@ -35,9 +34,6 @@ bool DbManager::isOpen() const
 {
     return m_db.isOpen();
 }
-
-
-
 
 QString DbManager::printAllRecords() const
 {
@@ -57,7 +53,6 @@ QString DbManager::printAllRecords() const
         answer.append("--------------------------------------------------");
         answer.append("\n");
     }
-
     return answer;
 }
 
@@ -113,12 +108,10 @@ void DbManager::getRecordOnDate(const QDate &date)
             qDebug() << "last ID:" << lastID;
         }
     }
-
 }
 
 QString DbManager::searchTermQuery(const QString &term)
 {
-
     bool success = false;
 
     QSqlQuery query;
@@ -144,7 +137,6 @@ QString DbManager::searchTermQuery(const QString &term)
             answer.append("\n");
         }
     }
-
     return answer;
 }
 
@@ -180,7 +172,6 @@ QString DbManager::similarDateQuery(const QDate &date)
             answer.append("\n");
         }
     }
-
     return answer;
 }
 
@@ -188,7 +179,6 @@ QString DbManager::similarDateQuery(const QDate &date)
 void DbManager::writeRecord(int &id, QString &dt, QString &mnth, int &dy, int &yr,
                             QString &dyOfWk, QString &entry)
 {
-
     bool success = false;
     QSqlQuery checkQuery;
     checkQuery.prepare("SELECT ID, Date FROM journal WHERE ID = (:idin)");
@@ -255,7 +245,6 @@ void DbManager::writeRecord(int &id, QString &dt, QString &mnth, int &dy, int &y
                 qDebug() << "new record add failed" << query.lastError();
             }
         }
-
     } else {
         qDebug() << "check query failed" << checkQuery.lastError();
     }
@@ -303,7 +292,6 @@ QString DbManager::getLastRecordDate() const
         name = query.value(idName).toString();
 
         qDebug() << "===" << name;
-
     }
     return name;
 

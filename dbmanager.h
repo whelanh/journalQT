@@ -26,7 +26,6 @@ public:
     QString lastDate;
     int lastID;
 
-
     /**
      * @brief Constructor
      *
@@ -105,7 +104,6 @@ public:
      * @return
      */
     QString searchTermQuery(const QString &term);
-
 
 private:
     QSqlDatabase m_db;

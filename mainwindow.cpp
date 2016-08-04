@@ -53,7 +53,6 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_writeButton_clicked()
 {
-
     DbManager db(PATH);
     QString dt = ui->dateEdit->date().toString("yyyy-MM-dd");
     int id = ui->dateEdit->date().toJulianDay() - 2455711;
@@ -65,8 +64,6 @@ void MainWindow::on_writeButton_clicked()
     //qDebug() << "id" << id << "date" << dt << "month" << month
     //        << "day" << day << "year" << year << "dayOfWeek" << dayOfWeek;
     db.writeRecord(id, dt, month,day, year, dayOfWeek, entry);
-
-
 }
 
 void MainWindow::on_dateEdit_dateChanged(const QDate &date)
@@ -74,7 +71,6 @@ void MainWindow::on_dateEdit_dateChanged(const QDate &date)
     DbManager db(PATH);
     db.getRecordOnDate(date);
     ui->textEdit->setText(db.lastEntry);
-
 }
 
 void MainWindow::on_similarDatesButton_clicked()
@@ -104,18 +100,14 @@ void MainWindow::on_weightHistoryButton_clicked()
     if(data.open(QFile::WriteOnly |QFile::Truncate)) {
         QTextStream output(&data);
 
-
         while (i.hasNext()) {
             i.next();
             answer.append(i.key() + " " + i.value() + "\n");
             output << i.key() << "," << i.value().toFloat() <<  "\n";
-
             // //qDebug() << i.key() << ": " << i.value() << endl;
         }
     }
     ui->textEdit->setText(answer);
-
-
 }
 
 void MainWindow::on_exportHtmlButton_clicked()
