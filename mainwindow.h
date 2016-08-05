@@ -60,8 +60,6 @@ private slots:
 private:
     Ui::MainWindow *ui;
 
-    QString m_sSettingsFile;
-
     DbManager * db;
 };
 

@@ -17,12 +17,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     // Find and remember location of journalSqlite.sqlite database
-    m_sSettingsFile = QApplication::applicationDirPath() + "/demosettings.ini";
-    //qDebug() << m_sSettingsFile;
-    QSettings MySettings(m_sSettingsFile, QSettings::NativeFormat);
-    //qDebug() << MySettings.value("path").toString();
+    QSettings MySettings;
+    // qDebug() << MySettings.fileName();
+    // qDebug() << MySettings.value("path").toString();
     PATH = MySettings.value("path").toString();
-    //qDebug() << PATH << PATH.length();
+    // qDebug() << PATH << PATH.length();
 
     if (PATH.length() == 0)
     {
