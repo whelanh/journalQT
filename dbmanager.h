@@ -34,6 +34,7 @@ public:
      */
     DbManager(const QString& path);
 
+
     /**
      * @brief Destructor
      *
@@ -46,20 +47,13 @@ public:
     /**
      * @brief Returns a string with all of the records in db
      */
-    QString printAllRecords() const;
+    QString printAllRecords();
 
     /**
      * @brief getLastRecord Entry and puts it in the text Edit box
      * @return
      */
     void getLastRecord();
-
-    /**
-     * @brief getLastRecordDate
-     * Gets the most recent record from the database
-     * @return
-     */
-    QString getLastRecordDate() const;
 
     /**
      * @brief getRecordOnDate
@@ -75,6 +69,22 @@ public:
      * @return
      */
     QMap<QString, QString> getWeightRecord();
+
+    /**
+     * @brief updateQuery
+     * @param item
+     * @param val
+     * @param id
+     */
+    void updateQuery(QString item, QString val, int id);
+
+    /**
+     * @brief updateQuery
+     * @param item
+     * @param val
+     * @param id
+     */
+    void updateQuery(QString item, int val, int id);
 
     /**
      * @brief writeRecord
@@ -107,6 +117,21 @@ public:
 
 private:
     QSqlDatabase m_db;
+
+    /**
+     * @brief queryAnswerFormatter
+     * Helper function to create QString with date, day of the week and entries separated by '--------'
+     * @param qry
+     * @return
+     */
+    QString queryAnswerFormatter(QSqlQuery &qry);
+
+    /**
+     * @brief assignClassVariablesWithOneQueryResult
+     * Helper function to assign class variables lastEntry, lastDate, int lastID from query result
+     * @param query
+     */
+    void assignClassVariablesWithOneQueryResult(QSqlQuery &query);
 };
 
 #endif // DBMANAGER_H

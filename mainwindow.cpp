@@ -37,11 +37,12 @@ MainWindow::MainWindow(QWidget *parent) :
         }
     }
 
-    DbManager db(PATH);
-    if (db.isOpen()) {
-        db.getLastRecord();
-        ui->textEdit->setText(db.lastEntry);
-        ui->dateEdit->setDate(QDate::fromString(db.lastDate,"yyyy-MM-dd"));
+    db = new DbManager(PATH);
+
+    if (db->isOpen()) {
+        db->getLastRecord();
+        ui->textEdit->setText(db->lastEntry);
+        ui->dateEdit->setDate(QDate::fromString(db->lastDate,"yyyy-MM-dd"));
     }
 }
 
@@ -52,7 +53,6 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_writeButton_clicked()
 {
-    DbManager db(PATH);
     QString dt = ui->dateEdit->date().toString("yyyy-MM-dd");
     int id = ui->dateEdit->date().toJulianDay() - 2455711;
     QString month(QDate::longMonthName(ui->dateEdit->date().month()));
@@ -62,39 +62,35 @@ void MainWindow::on_writeButton_clicked()
     QString entry = ui->textEdit->toPlainText();
     //qDebug() << "id" << id << "date" << dt << "month" << month
     //        << "day" << day << "year" << year << "dayOfWeek" << dayOfWeek;
-    db.writeRecord(id, dt, month,day, year, dayOfWeek, entry);
+    db->writeRecord(id, dt, month,day, year, dayOfWeek, entry);
 }
 
 void MainWindow::on_dateEdit_dateChanged(const QDate &date)
 {
-    DbManager db(PATH);
-    db.getRecordOnDate(date);
-    ui->textEdit->setText(db.lastEntry);
+    db->getRecordOnDate(date);
+    ui->textEdit->setText(db->lastEntry);
 }
 
 void MainWindow::on_similarDatesButton_clicked()
 {
-    DbManager db(PATH);
-    QString result = db.similarDateQuery(ui->dateEdit->date());
+    QString result = db->similarDateQuery(ui->dateEdit->date());
     ui->textEdit->setText(result);
 }
 
 void MainWindow::on_searchButton_clicked()
 {
-    DbManager db(PATH);
     QString term = ui->lineEdit->text();
-    QString result = db.searchTermQuery(term);
+    QString result = db->searchTermQuery(term);
     ui->textEdit->setText(result);
 }
 
 void MainWindow::on_weightHistoryButton_clicked()
 {
-    DbManager db(PATH);
-    QMap<QString, QString> map = db.getWeightRecord();
+    QMap<QString, QString> map = db->getWeightRecord();
     QMapIterator<QString, QString> i(map);
     QString answer;
     QString filename = QFileDialog::getSaveFileName(this,
-      "Save To CSV", "weightHistory.csv", "CSV files (.csv);;Zip files (.zip, *.7z)", 0, 0); // getting the filename (full path)
+                                                    "Save To CSV", "weightHistory.csv", "CSV files (.csv);;Zip files (.zip, *.7z)", 0, 0); // getting the filename (full path)
     QFile data(filename);
     if(data.open(QFile::WriteOnly |QFile::Truncate)) {
         QTextStream output(&data);
@@ -111,8 +107,7 @@ void MainWindow::on_weightHistoryButton_clicked()
 
 void MainWindow::on_exportHtmlButton_clicked()
 {
-    DbManager db(PATH);
-    QString tmp = db.printAllRecords();
+    QString tmp = db->printAllRecords();
     QTextDocument mdoc(tmp);
     QString filename = QFileDialog::getSaveFileName(this, "Save to HTML", "journal.html","html files (.html);" , 0, 0); // getting the filename (full path)
     QFile data(filename);

@@ -1,7 +1,9 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "dbmanager.h"
 #include <QMainWindow>
+
 
 namespace Ui {
 class MainWindow;
@@ -59,6 +61,8 @@ private:
     Ui::MainWindow *ui;
 
     QString m_sSettingsFile;
+
+    DbManager * db;
 };
 
 #endif // MAINWINDOW_H

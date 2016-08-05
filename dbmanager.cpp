@@ -33,43 +33,48 @@ bool DbManager::isOpen() const
     return m_db.isOpen();
 }
 
-QString DbManager::printAllRecords() const
+QString DbManager::printAllRecords()
 {
     // qDebug() << "all records db:";
+    bool success = false;
+
     QSqlQuery query("SELECT Date, DayOfWeek, Entry FROM journal Order by Date DESC");
     QString answer;
-    while (query.next())
-    {
-        int id = query.record().indexOf("Date");
-        QString date = query.value(id).toString();
-        id = query.record().indexOf("DayOfWeek");
-        QString dayOfWk = query.value(id).toString();
-        id = query.record().indexOf("Entry");
-        QString entry = query.value(id).toString();
-        answer.append(date + " " + dayOfWk + "\n");
-        answer.append(entry + "\n");
-        answer.append("--------------------------------------------------");
-        answer.append("\n");
+    success = query.exec();
+
+    if (success) {
+        answer = queryAnswerFormatter(query);
     }
+
     return answer;
 }
 
 void DbManager::getLastRecord()
 {
     // qDebug() << "Last entry in journal:";
+    bool success = false;
+
     QSqlQuery query("SELECT ID, Date, Entry FROM journal ORDER BY Date DESC LIMIT 1;");
-    int idName = query.record().indexOf("Entry");
-    while (query.next())
-    {
-        QString name = query.value(idName).toString();
-        // qDebug() << "===" << name;
-        lastEntry = name;
+    success = query.exec();
+    if(!success) {
+        // qDebug() << "query failed";
+    } else {
+        assignClassVariablesWithOneQueryResult(query);
+    }
+
+}
+
+void DbManager::assignClassVariablesWithOneQueryResult(QSqlQuery &query) {
+    lastEntry = "";
+    lastID = 0;
+    lastDate = "";
+    while (query.next()) {
+        int idName = query.record().indexOf("Entry");
+        lastEntry = query.value(idName).toString();
         idName = query.record().indexOf("Date");
-        QString lastdate = query.value(idName).toString();
-        lastDate = lastdate;
+        lastDate = query.value(idName).toString();
         idName = query.record().indexOf("ID");
-        int lastid = query.value(idName).toInt();
-        lastID = lastid;
+        lastID = query.value(idName).toInt();
         // qDebug() << "last ID:" << lastID;
     }
 }
@@ -89,22 +94,7 @@ void DbManager::getRecordOnDate(const QDate &date)
     if(!success) {
         // qDebug() << "query failed";
     } else {
-        lastEntry = "";
-        lastID = 0;
-        lastDate = dt;
-        while (query.next()) {
-            int idName = query.record().indexOf("Entry");
-            QString name = query.value(idName).toString();
-            // qDebug() << "===" << name;
-            lastEntry = name;
-            idName = query.record().indexOf("Date");
-            QString lastdate = query.value(idName).toString();
-            lastDate = lastdate;
-            idName = query.record().indexOf("ID");
-            int lastid = query.value(idName).toInt();
-            lastID = lastid;
-            // qDebug() << "last ID:" << lastID;
-        }
+        assignClassVariablesWithOneQueryResult(query);
     }
 }
 
@@ -122,18 +112,27 @@ QString DbManager::searchTermQuery(const QString &term)
     QString answer;
 
     if (success) {
-        while(query.next()) {
-            int idName = query.record().indexOf("Entry");
-            QString entry = query.value(idName).toString();
-            idName = query.record().indexOf("Date");
-            QString dtString = query.value(idName).toString();
-            idName = query.record().indexOf("DayOfWeek");
-            QString dowString = query.value(idName).toString();
-            answer.append(dtString + " " + dowString + "\n");
-            answer.append(entry + "\n");
-            answer.append("--------------------------------------------------");
-            answer.append("\n");
-        }
+        answer = queryAnswerFormatter(query);
+    }
+
+    return answer;
+}
+
+
+QString DbManager::queryAnswerFormatter(QSqlQuery &qry)
+{
+    QString answer;
+    while(qry.next()) {
+        int idName = qry.record().indexOf("Entry");
+        QString entry = qry.value(idName).toString();
+        idName = qry.record().indexOf("Date");
+        QString dtString = qry.value(idName).toString();
+        idName = qry.record().indexOf("DayOfWeek");
+        QString dowString = qry.value(idName).toString();
+        answer.append(dtString + " " + dowString + "\n");
+        answer.append(entry + "\n");
+        answer.append("--------------------------------------------------");
+        answer.append("\n");
     }
     return answer;
 }
@@ -157,22 +156,51 @@ QString DbManager::similarDateQuery(const QDate &date)
     QString answer;
 
     if (success) {
-        while(query.next()) {
-            int idName = query.record().indexOf("Entry");
-            QString entry = query.value(idName).toString();
-            idName = query.record().indexOf("Date");
-            QString dtString = query.value(idName).toString();
-            idName = query.record().indexOf("DayOfWeek");
-            QString dowString = query.value(idName).toString();
-            answer.append(dtString + " " + dowString + "\n");
-            answer.append(entry + "\n");
-            answer.append("--------------------------------------------------");
-            answer.append("\n");
-        }
+        answer = queryAnswerFormatter(query);
     }
     return answer;
 }
 
+void DbManager::updateQuery(QString item, QString val, int id)
+{
+    bool success = false;
+
+    QSqlQuery qupdate;
+    QString q("UPDATE journal SET ");
+    q.append(item);
+    q.append("= (:etry) WHERE ID = (:idin);");
+    qupdate.prepare(q);
+    qupdate.bindValue(":etry", val);
+    qupdate.bindValue(":idin", id);
+    success = qupdate.exec();
+
+    if (success) {
+        // qDebug() << "existing record updated";
+    } else {
+        // qDebug() << "existing record update failed" << qupdate.lastError();
+    }
+}
+
+void DbManager::updateQuery(QString item, int val, int id)
+{
+    bool success = false;
+
+    QSqlQuery qupdate;
+    QString q("UPDATE journal SET ");
+    q.append(item);
+    q.append("= (:etry) WHERE ID = (:idin);");
+    qupdate.prepare(q);
+    qupdate.bindValue(":etry", val);
+    qupdate.bindValue(":idin", id);
+    success = qupdate.exec();
+
+    if (success) {
+        // qDebug() << "existing record updated";
+    } else {
+        // qDebug() << "existing record update failed" << qupdate.lastError();
+    }
+
+}
 
 void DbManager::writeRecord(int &id, QString &dt, QString &mnth, int &dy, int &yr,
                             QString &dyOfWk, QString &entry)
@@ -186,43 +214,13 @@ void DbManager::writeRecord(int &id, QString &dt, QString &mnth, int &dy, int &y
     {
         if (checkQuery.next())
         {
+            updateQuery("Entry",entry,id);
+            updateQuery("Date", dt, id);
+            updateQuery("Month", mnth, id);
+            updateQuery("Day", dy, id);
+            updateQuery("Year", yr, id);
+            updateQuery("DayOfWeek", dyOfWk, id);
 
-            QSqlQuery qupdate;
-            qupdate.prepare("UPDATE journal SET Entry = (:etry) WHERE ID = (:idin);");
-            qupdate.bindValue(":idin", id);
-            qupdate.bindValue(":etry", entry);
-            qupdate.exec();
-
-            qupdate.prepare("UPDATE journal SET Date = (:etry) WHERE ID = (:idin);");
-            qupdate.bindValue(":etry", dt);
-            qupdate.bindValue(":idin", id);
-            qupdate.exec();
-
-            qupdate.prepare("UPDATE journal SET Month = (:etry) WHERE ID = (:idin);");
-            qupdate.bindValue(":etry", mnth);
-            qupdate.bindValue(":idin", id);
-            qupdate.exec();
-
-            qupdate.prepare("UPDATE journal SET Day = (:etry) WHERE ID = (:idin);");
-            qupdate.bindValue(":etry", dy);
-            qupdate.bindValue(":idin", id);
-            qupdate.exec();
-
-            qupdate.prepare("UPDATE journal SET Year = (:etry) WHERE ID = (:idin);");
-            qupdate.bindValue(":etry", yr);
-            qupdate.bindValue(":idin", id);
-            qupdate.exec();
-
-            qupdate.prepare("UPDATE journal SET DayOfWeek = (:etry) WHERE ID = (:idin);");
-            qupdate.bindValue(":etry", dyOfWk);
-            qupdate.bindValue(":idin", id);
-            success = qupdate.exec();
-
-            if (success) {
-                // qDebug() << "existing record updated";
-            } else {
-                // qDebug() << "existing record update failed" << qupdate.lastError();
-            }
         }
         else
         {
@@ -278,20 +276,6 @@ QMap<QString, QString> DbManager::getWeightRecord()
     return wtMap;
 }
 
-QString DbManager::getLastRecordDate() const
-{
-    QString name;
-    // qDebug() << "last date in journal";
-    QSqlQuery query("SELECT Date, Entry FROM journal ORDER BY Date DESC LIMIT 1;");
-    int idName = query.record().indexOf("Date");
-    while (query.next())
-    {
-        name = query.value(idName).toString();
 
-        // qDebug() << "===" << name;
-    }
-    return name;
-
-}
 
 
