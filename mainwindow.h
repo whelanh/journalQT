@@ -3,6 +3,7 @@
 
 #include "dbmanager.h"
 #include <QMainWindow>
+#include <QSettings>
 
 
 namespace Ui {
@@ -18,6 +19,11 @@ public:
     ~MainWindow();
 
 private slots:
+
+    /**
+     * @brief invalidMessage
+     */
+    void invalidMessage();
 
     /**
      * @brief MainWindow::on_writeButton_clicked
@@ -61,6 +67,10 @@ private:
     Ui::MainWindow *ui;
 
     DbManager * db;
+
+    QSettings MySettings;
+
+    QString PATH;
 };
 
 #endif // MAINWINDOW_H

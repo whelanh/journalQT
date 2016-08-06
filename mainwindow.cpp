@@ -8,8 +8,6 @@
 #include <QMessageBox>
 #include <QSettings>
 
-static QString PATH = "";
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -17,7 +15,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     // Find and remember location of journalSqlite.sqlite database
-    QSettings MySettings;
     // qDebug() << MySettings.fileName();
     // qDebug() << MySettings.value("path").toString();
     PATH = MySettings.value("path").toString();
@@ -29,7 +26,7 @@ MainWindow::MainWindow(QWidget *parent) :
                     this, "Select journalSqlite.sqlite" );
 
         if (!SelectedFile.isEmpty()) {
-            //qDebug() << MySettings.value("path").toString();
+            // qDebug() << MySettings.value("path").toString();
             PATH = SelectedFile;
 
             db = new DbManager(PATH);
@@ -41,27 +38,41 @@ MainWindow::MainWindow(QWidget *parent) :
                     ui->dateEdit->setDate(QDate::fromString(db->lastDate,"yyyy-MM-dd"));
                     MySettings.setValue("path", SelectedFile);
                 } else {
-                    QMessageBox msgBox;
-                    msgBox.setText("You tried to open an invalid database without a table 'journal'"
-                                   " with columns: ID, Date, Month, Day, Year, DayOfWeek, Entry \n"
-                                   "Close the program and restart to load a valid database.");
-                    msgBox.exec();
-                    PATH = "";
-                    MySettings.setValue("path", PATH);
-
+                    invalidMessage();
                 }
             } else {
-               // qDebug() << "DB not open";
+                // qDebug() << "DB not open";
             }
         }
+    } else {
+        db = new DbManager(PATH);
 
-
+        if (db->isOpen()) {
+            if (db->isValidDatabase()) {
+                db->getLastRecord();
+                ui->textEdit->setText(db->lastEntry);
+                ui->dateEdit->setDate(QDate::fromString(db->lastDate,"yyyy-MM-dd"));
+            } else {
+                invalidMessage();
+            }
+        }
     }
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::invalidMessage()
+{
+    QMessageBox msgBox;
+    msgBox.setText("You tried to open an invalid database without a table 'journal'"
+                   " with columns: ID, Date, Month, Day, Year, DayOfWeek, Entry \n"
+                   "Close the program and restart to load a valid database.");
+    msgBox.exec();
+    PATH = "";
+    MySettings.setValue("path", PATH);
 }
 
 void MainWindow::on_writeButton_clicked()
@@ -107,7 +118,7 @@ void MainWindow::on_weightHistoryButton_clicked()
     QMapIterator<QString, QString> i(map);
     QString answer;
     QString filename = QFileDialog::getSaveFileName(this,
-                                                    "Save To CSV", "weightHistory.csv", "CSV files (.csv);;Zip files (.zip, *.7z)", 0, 0); // getting the filename (full path)
+      "Save To CSV", "weightHistory.csv", "CSV files (.csv);;Zip files (.zip, *.7z)", 0, 0); // getting the filename (full path)
     QFile data(filename);
     if(data.open(QFile::WriteOnly |QFile::Truncate)) {
         QTextStream output(&data);
@@ -126,7 +137,8 @@ void MainWindow::on_exportHtmlButton_clicked()
 {
     QString tmp = db->printAllRecords();
     QTextDocument mdoc(tmp);
-    QString filename = QFileDialog::getSaveFileName(this, "Save to HTML", "journal.html","html files (.html);" , 0, 0); // getting the filename (full path)
+    QString filename = QFileDialog::getSaveFileName(this, "Save to HTML",
+       "journal.html","html files (.html);" , 0, 0); // getting the filename (full path)
     QFile data(filename);
     if(data.open(QFile::WriteOnly |QFile::Truncate)) {
         QTextStream output(&data);
