@@ -13,12 +13,13 @@ DbManager::DbManager(const QString &path)
 
     if (!m_db.open())
     {
-        // qDebug() << "Error: connection with database failed";
+       //  qDebug() << "Error: connection with database failed";
     } else
     {
-        // qDebug() << "Database: connection ok";
+       //  qDebug() << "Database: connection ok";
     }
 }
+
 
 DbManager::~DbManager()
 {
@@ -31,6 +32,18 @@ DbManager::~DbManager()
 bool DbManager::isOpen() const
 {
     return m_db.isOpen();
+}
+
+bool DbManager::isValidDatabase()
+{
+    bool success = true;
+
+    QSqlQuery query("SELECT ID, Date, Entry FROM journal ORDER BY Date DESC LIMIT 1;");
+    success = query.exec();
+    if(!success) {
+       success = false;
+    }
+    return success;
 }
 
 QString DbManager::printAllRecords()

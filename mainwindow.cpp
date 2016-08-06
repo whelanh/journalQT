@@ -29,19 +29,33 @@ MainWindow::MainWindow(QWidget *parent) :
                     this, "Select journalSqlite.sqlite" );
 
         if (!SelectedFile.isEmpty()) {
-
-            MySettings.setValue("path", SelectedFile);
             //qDebug() << MySettings.value("path").toString();
             PATH = SelectedFile;
+
+            db = new DbManager(PATH);
+
+            if (db->isOpen()) {
+                if (db->isValidDatabase()) {
+                    db->getLastRecord();
+                    ui->textEdit->setText(db->lastEntry);
+                    ui->dateEdit->setDate(QDate::fromString(db->lastDate,"yyyy-MM-dd"));
+                    MySettings.setValue("path", SelectedFile);
+                } else {
+                    QMessageBox msgBox;
+                    msgBox.setText("You tried to open an invalid database without a table 'journal'"
+                                   " with columns: ID, Date, Month, Day, Year, DayOfWeek, Entry \n"
+                                   "Close the program and restart to load a valid database.");
+                    msgBox.exec();
+                    PATH = "";
+                    MySettings.setValue("path", PATH);
+
+                }
+            } else {
+               // qDebug() << "DB not open";
+            }
         }
-    }
 
-    db = new DbManager(PATH);
 
-    if (db->isOpen()) {
-        db->getLastRecord();
-        ui->textEdit->setText(db->lastEntry);
-        ui->dateEdit->setDate(QDate::fromString(db->lastDate,"yyyy-MM-dd"));
     }
 }
 
@@ -66,18 +80,21 @@ void MainWindow::on_writeButton_clicked()
 
 void MainWindow::on_dateEdit_dateChanged(const QDate &date)
 {
+    ui->writeButton->setEnabled(true);
     db->getRecordOnDate(date);
     ui->textEdit->setText(db->lastEntry);
 }
 
 void MainWindow::on_similarDatesButton_clicked()
 {
+    ui->writeButton->setEnabled(false);
     QString result = db->similarDateQuery(ui->dateEdit->date());
     ui->textEdit->setText(result);
 }
 
 void MainWindow::on_searchButton_clicked()
 {
+    ui->writeButton->setEnabled(false);
     QString term = ui->lineEdit->text();
     QString result = db->searchTermQuery(term);
     ui->textEdit->setText(result);
@@ -85,6 +102,7 @@ void MainWindow::on_searchButton_clicked()
 
 void MainWindow::on_weightHistoryButton_clicked()
 {
+    ui->writeButton->setEnabled(false);
     QMap<QString, QString> map = db->getWeightRecord();
     QMapIterator<QString, QString> i(map);
     QString answer;

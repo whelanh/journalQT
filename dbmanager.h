@@ -42,7 +42,17 @@ public:
      */
     ~DbManager();
 
+    /**
+     * @brief isOpen
+     * @return
+     */
     bool isOpen() const;
+
+    /**
+     * @brief isValidDatabase
+     * @return
+     */
+    bool isValidDatabase();
 
     /**
      * @brief Returns a string with all of the records in db
