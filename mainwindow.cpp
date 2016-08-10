@@ -82,7 +82,7 @@ void MainWindow::on_writeButton_clicked()
     QString month(QDate::longMonthName(ui->dateEdit->date().month()));
     int day = ui->dateEdit->date().day();
     int year = ui->dateEdit->date().year();
-    QString dayOfWeek(QDate::longDayName(ui->dateEdit->date().day()));
+    QString dayOfWeek(QDate::longDayName(ui->dateEdit->date().dayOfWeek()));
     QString entry = ui->textEdit->toPlainText();
     //qDebug() << "id" << id << "date" << dt << "month" << month
     //        << "day" << day << "year" << year << "dayOfWeek" << dayOfWeek;
