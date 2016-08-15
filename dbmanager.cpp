@@ -111,16 +111,32 @@ void DbManager::getRecordOnDate(const QDate &date)
     }
 }
 
+
 QString DbManager::searchTermQuery(const QString &term)
 {
     bool success = false;
 
     QSqlQuery query;
+    QStringList terms = term.split(",");
+    int termNum = terms.size();
 
-    QString q("SELECT Date, DayOfWeek, Entry from journal where (journal.Entry LIKE ?) order by Date");
+    QString q("SELECT Date, DayOfWeek, Entry FROM journal WHERE (journal.Entry LIKE ?");
+
+    if (termNum > 1) {
+        for (int i=1;i<termNum;i++) {
+            q.append(" AND journal.Entry LIKE ?");
+        }
+    }
+    q.append(") ORDER BY Date");
     query.prepare(q);
-    query.addBindValue(QString("\%" + term + "\%"));
-    // qDebug() << q  << " term:" << term;
+
+    for (int i=0;i<termNum;i++) {
+        query.addBindValue(QString("\%" + terms.at(i) + "\%"));
+    }
+
+    qDebug() << q;
+
+
     success = query.exec();
     QString answer;
 

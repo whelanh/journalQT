@@ -119,7 +119,7 @@ public:
 
     /**
      * @brief searchTermQuery
-     * Returns all journal entries that contain search term
+     * Returns all journal entries that contain terms similar to search terms separated by commas
      * @param term
      * @return
      */
