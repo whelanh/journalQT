@@ -22,46 +22,43 @@ MainWindow::MainWindow(QWidget *parent) :
 
     if (PATH.length() == 0)
     {
-        QString SelectedFile = QFileDialog::getOpenFileName(
+        SelectedFile = QFileDialog::getOpenFileName(
                     this, "Select journalSqlite.sqlite" );
 
         if (!SelectedFile.isEmpty()) {
             // qDebug() << MySettings.value("path").toString();
             PATH = SelectedFile;
-
-            db = new DbManager(PATH);
-
-            if (db->isOpen()) {
-                if (db->isValidDatabase()) {
-                    db->getLastRecord();
-                    ui->textEdit->setText(db->lastEntry);
-                    ui->dateEdit->setDate(QDate::fromString(db->lastDate,"yyyy-MM-dd"));
-                    MySettings.setValue("path", SelectedFile);
-                } else {
-                    invalidMessage();
-                }
-            } else {
-                // qDebug() << "DB not open";
-            }
+            getLastRecordAndSetUi(true);
         }
     } else {
-        db = new DbManager(PATH);
-
-        if (db->isOpen()) {
-            if (db->isValidDatabase()) {
-                db->getLastRecord();
-                ui->textEdit->setText(db->lastEntry);
-                ui->dateEdit->setDate(QDate::fromString(db->lastDate,"yyyy-MM-dd"));
-            } else {
-                invalidMessage();
-            }
-        }
+        getLastRecordAndSetUi(false);
     }
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+
+void MainWindow::getLastRecordAndSetUi(bool newDatabase)
+{
+    db = new DbManager(PATH);
+
+    if (db->isOpen()) {
+        if (db->isValidDatabase()) {
+            db->getLastRecord();
+            ui->textEdit->setText(db->lastEntry);
+            ui->dateEdit->setDate(QDate::fromString(db->lastDate,"yyyy-MM-dd"));
+            if (newDatabase) {
+                MySettings.setValue("path", SelectedFile);
+            }
+        } else {
+            invalidMessage();
+        }
+    } else {
+        // qDebug() << "DB not open";
+    }
 }
 
 void MainWindow::invalidMessage()
@@ -146,4 +143,11 @@ void MainWindow::on_exportHtmlButton_clicked()
 
         output << mdoc.toHtml("utf-8");
     }
+}
+
+void MainWindow::on_todayButton_clicked()
+{
+    QDate date = QDate::currentDate();
+    ui->dateEdit->setDate(date);
+    on_dateEdit_dateChanged(date);
 }

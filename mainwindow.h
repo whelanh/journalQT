@@ -26,6 +26,11 @@ private slots:
     void invalidMessage();
 
     /**
+     * @brief getLastRecordAndSetUi
+     */
+    void getLastRecordAndSetUi(bool newDatabase);
+
+    /**
      * @brief MainWindow::on_writeButton_clicked
      * writes record to database
      */
@@ -63,6 +68,12 @@ private slots:
      */
     void on_exportHtmlButton_clicked();
 
+    /**
+     * @brief on_todayButton_clicked
+     * Sets date and entry based on today's date
+     */
+    void on_todayButton_clicked();
+
 private:
     Ui::MainWindow *ui;
 
@@ -71,6 +82,8 @@ private:
     QSettings MySettings;
 
     QString PATH;
+
+    QString SelectedFile;
 };
 
 #endif // MAINWINDOW_H

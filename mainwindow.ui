@@ -148,7 +148,7 @@
       <x>150</x>
       <y>50</y>
       <width>1001</width>
-      <height>541</height>
+      <height>481</height>
      </rect>
     </property>
    </widget>
@@ -262,6 +262,19 @@
     </property>
     <property name="text">
      <string>Export to HTML</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="todayButton">
+    <property name="geometry">
+     <rect>
+      <x>1024</x>
+      <y>540</y>
+      <width>121</width>
+      <height>38</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Today's Entry</string>
     </property>
    </widget>
   </widget>
